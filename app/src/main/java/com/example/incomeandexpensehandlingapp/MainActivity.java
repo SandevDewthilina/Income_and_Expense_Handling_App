@@ -6,9 +6,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     //ui elements
     private Toolbar toolbar;
+    private Button manageBankBtn, pastTransactionBtn, newTransactionBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +41,38 @@ public class MainActivity extends AppCompatActivity {
         * */
         toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(null);
+        getSupportActionBar().setTitle("Dashboard");
+
+        manageBankBtn = findViewById(R.id.main_mange_bank_account_btn);
+        pastTransactionBtn = findViewById(R.id.main_past_transaction_btn);
+        newTransactionBtn = findViewById(R.id.main_new_transaction_btn);
+
+        /*
+        * set Listners to the buttons
+        * */
+        manageBankBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent bankIntent = new Intent(MainActivity.this, ManageBankActivity.class);
+                startActivity(bankIntent);
+            }
+        });
+
+        newTransactionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newTransactionIntent = new Intent(MainActivity.this, NewTransactionActivity.class);
+                startActivity(newTransactionIntent);
+            }
+        });
+
+        pastTransactionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pastTransactionIntent = new Intent(MainActivity.this, PastTransactionActivity.class);
+                startActivity(pastTransactionIntent);
+            }
+        });
 
     }
 
@@ -48,12 +81,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
-
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
 
         switch (item.getItemId()) {
 
@@ -64,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
 
             default:
                 return super.onOptionsItemSelected(item);
-
-
         }
 
     }
@@ -96,4 +125,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
 }

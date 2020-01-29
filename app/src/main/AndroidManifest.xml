@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.incomeandexpensehandlingapp">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -11,7 +13,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".PastTransactionActivity"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity android:name=".NewTransactionActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".ManageBankActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".LoginActivity" />
         <activity android:name=".StartActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -20,6 +28,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
