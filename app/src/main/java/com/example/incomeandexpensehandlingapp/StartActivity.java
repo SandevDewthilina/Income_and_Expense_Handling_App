@@ -13,15 +13,15 @@ import com.google.firebase.auth.FirebaseUser;
 public class StartActivity extends AppCompatActivity {
 
     /*
-    * Firebase connection
-    * */
+     * Firebase connection
+     * */
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
 
 
     /*
-    * Ui items
-    * */
+     * Ui items
+     * */
     private Button startBtn;
 
     @Override
@@ -65,4 +65,3 @@ public class StartActivity extends AppCompatActivity {
 
     }
 }
-

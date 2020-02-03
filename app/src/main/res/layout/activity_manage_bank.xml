@@ -92,10 +92,10 @@
         android:padding="10dp"
         android:text="Please note that checking the current bank account may deduct 5.00 from\nyour account"
         android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/new_balance_enter_txt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bank_balance_txt" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/new_balance_enter_txt"
@@ -147,4 +147,15 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bank_account_toolbar" />
+
+    <TextView
+        android:id="@+id/last_updated_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_light"
+        android:text="Bank balance has not yet been updated"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bank_balance_txt" />
 </androidx.constraintlayout.widget.ConstraintLayout>

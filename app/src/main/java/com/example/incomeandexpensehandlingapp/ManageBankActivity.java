@@ -23,6 +23,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.HashMap;
 
 public class ManageBankActivity extends AppCompatActivity {
@@ -32,14 +38,14 @@ public class ManageBankActivity extends AppCompatActivity {
     * */
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
-    private FirebaseDatabase database;
-    private DatabaseReference databaseReference;
+    private FirebaseFirestore firebaseFirestore;
 
     /*
      *make ui elements
      */
     private Toolbar toolbar;
     private TextView newBalance;
+    private TextView lastSeen;
     private EditText newAmountTxt;
     private Button enterBtn;
     private Button checkBalanceBtn;
@@ -63,14 +69,14 @@ public class ManageBankActivity extends AppCompatActivity {
         //firebase
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        database = FirebaseDatabase.getInstance();
-        databaseReference = database.getReference();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
         //user id
         userId = currentUser.getUid();
 
         //ui items
         newBalance = findViewById(R.id.bank_balance_txt);
+        lastSeen = findViewById(R.id.last_updated_list);
         newAmountTxt = findViewById(R.id.new_balance_enter_txt);
         enterBtn = findViewById(R.id.enter_bank_balance_btn);
         checkBalanceBtn = findViewById(R.id.check_bank_balance_btn);
@@ -89,26 +95,24 @@ public class ManageBankActivity extends AppCompatActivity {
 
                 String checkedBankBalance = newAmountTxt.getText().toString();
 
-                HashMap<String, String> bankBalanceEntry = new HashMap<>();
+                HashMap<String, Object> bankBalanceEntry = new HashMap<>();
                 bankBalanceEntry.put("bank_balance", checkedBankBalance);
-                //bankBalanceEntry.put("time_entered", FieldValue.serverTimestamp());
+                bankBalanceEntry.put("time_entered", FieldValue.serverTimestamp());
 
                 //databaseReference.child("updatedBalance").child(userId).removeValue();
-                databaseReference.child("updatedBalance").child(userId).setValue(bankBalanceEntry)
+                firebaseFirestore.collection("Bank").document(userId).set(bankBalanceEntry)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-
                             if (task.isSuccessful()) {
 
-                               readBankBalanceFromdatabase();
+                                readBankBalanceFromdatabase();
 
                             } else {
 
                                 Toast.makeText(ManageBankActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
 
                             }
-
                         }
                     });
 
@@ -129,32 +133,28 @@ public class ManageBankActivity extends AppCompatActivity {
 
     private void readBankBalanceFromdatabase() {
 
-        databaseReference.child("updatedBalance").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+        firebaseFirestore.collection("Bank").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
-                if (dataSnapshot.child("bank_balance").exists()) {
+                if (task.isSuccessful()) {
 
-                    String bank_balance_received = dataSnapshot.child("bank_balance").getValue().toString();
+                    String bank_balance_received = task.getResult().getString("bank_balance");
+                    String date = task.getResult().getDate("time_entered").toString();
 
                     newBalance.setText(bank_balance_received);
+                    lastSeen.setText(date);
                     progressBar.setVisibility(View.INVISIBLE);
                     newAmountTxt.setText(null);
 
                 } else {
-
                     newBalance.setText("00.00");
+                    lastSeen.setText("Bank balance has not yet been updated");
                     progressBar.setVisibility(View.INVISIBLE);
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                progressBar.setVisibility(View.INVISIBLE);
 
             }
         });
-
     }
 
     public void dialPhoneNumber(String phoneNumber) {

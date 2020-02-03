@@ -10,19 +10,35 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
 
     //firebase connection
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
+    private FirebaseFirestore firebaseFirestore;
 
     //ui elements
     private Toolbar toolbar;
     private Button manageBankBtn, pastTransactionBtn, newTransactionBtn;
+    private TextView income, expense;
+
+    private String userId;
+    private double total_income = 0d;
+    private double total_expense = 0d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +51,13 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        if (currentUser != null) {
+
+            userId = currentUser.getUid();
+
+        }
 
         /*
         * Making ui elements
@@ -46,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
         manageBankBtn = findViewById(R.id.main_mange_bank_account_btn);
         pastTransactionBtn = findViewById(R.id.main_past_transaction_btn);
         newTransactionBtn = findViewById(R.id.main_new_transaction_btn);
+        income = findViewById(R.id.dashboard_income_txt);
+        expense = findViewById(R.id.dashboard_expence_txt);
 
         /*
         * set Listners to the buttons
@@ -73,6 +98,45 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(pastTransactionIntent);
             }
         });
+
+        calculateTurnover();
+
+    }
+
+    private void calculateTurnover() {
+
+        if (currentUser != null) {
+
+            firebaseFirestore.collection("BankTransactions/" + userId + "/transactions")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                            for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+
+                                if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                                    String type = doc.getDocument().getString("type");
+
+                                    if (type.equals("Income")) {
+
+                                        total_income += Double.parseDouble(doc.getDocument().getString("amount"));
+
+                                    } else {
+
+                                        total_expense += Double.parseDouble(doc.getDocument().getString("amount"));
+
+                                    }
+
+                                }
+                            }
+
+                            income.setText(String.valueOf(total_income));
+                            expense.setText(String.valueOf(total_expense));
+
+                        }
+                    });
+        }
 
     }
 
